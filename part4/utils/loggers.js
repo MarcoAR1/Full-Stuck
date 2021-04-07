@@ -1,4 +1,7 @@
+const info = (info) => console.log(info)
+const error = (err) => console.error(err)
+
 module.exports = {
-  info: (info) => console.log(info),
-  error: (err) => console.error(err),
+  info,
+  error,
 }
