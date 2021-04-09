@@ -1,5 +1,5 @@
 const list_halper = require('../utils/list_halper')
-const demoBlogs = require('./demoBlogs')
+const [...demoBlogs] = require('./demoBlogs')
 
 test('dummy return one', () => {
   const result = list_halper.dummy(demoBlogs)

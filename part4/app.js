@@ -1,9 +1,13 @@
 const express = require('express')
+require('express-async-errors')
 const blogRoutes = require('./controllers/blog')
-const app = express()
+const userRouter = require('./controllers/user')
 const cors = require('cors')
 const morgan = require('morgan')
 const { handleError } = require('./utils/middleware')
+
+//Settings
+const app = express()
 
 // Middleware
 app.use(cors())
@@ -17,6 +21,7 @@ morgan.token('json', (req) => {
 
 //Routes
 app.use('/api/blogs', blogRoutes)
+app.use('/api/user', userRouter)
 
 //Middleware Error
 app.use(handleError)
