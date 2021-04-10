@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
-const supertest = require('supertest')
-const { app, Server } = require('../index')
+const jwt = require('jsonwebtoken')
 const Blog = require('../models/Blog')
 const User = require('../models/User')
 const {
@@ -8,10 +7,13 @@ const {
   dbFindById,
   dbResetBlog,
   dbResetUser,
+  CreateABlogAndToken,
+  singAUser,
+  api,
+  Server,
 } = require('../utils/list_halper')
 const [...demoBlogs] = require('./demoBlogs.js')
 const url = `/api/blogs`
-const api = supertest(app)
 
 beforeEach(async () => {
   await dbResetUser()
@@ -56,37 +58,41 @@ describe('Get blogs api', () => {
 
 describe('Post a blog', () => {
   test('the blog is created successful', async () => {
+    const { token } = await singAUser()
     const newBlog = {
       title: 'Mi Primer Blog hola Que Hacer',
       author: 'Marco Antonio Rivero',
       url: 'myprimerblog.blog.com',
       likes: 0,
     }
-    await api
+
+    const createdBlog = await api
       .post(url)
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const userLogin = await api
-      .post('api/login')
-      .send({ username: 'Micheltone', password: 'React patterns' })
-    console.log(userLogin.body)
-
     const requestApi = await api.get(url)
     const data = requestApi.body
+    const iduser = jwt.verify(token, process.env.SING)
+
+    expect(createdBlog.body.user_id).toStrictEqual(iduser.id)
     expect(data.map((blog) => blog.title)).toContain(newBlog.title)
     expect(data.length).toBe(demoBlogs.length + 1)
   })
 
   test('if like dont exist in the request her value is 0 ', async () => {
+    const { token } = await singAUser()
     const newBlog = {
       title: 'Mi Segundo Blog hola Que Hacer',
       author: 'Marco Antonio Rivero',
       url: 'mysegundoblog.blog.com',
     }
+
     const requestApi = await api
       .post(url)
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -95,41 +101,119 @@ describe('Post a blog', () => {
     expect(requestApi.body.likes).toEqual(0)
   })
   test('if dont exist url, title or author a error 400 bad request', async () => {
+    const { token } = await singAUser()
     const newBlog = {
       likes: 25,
     }
-    await api.post(url).send(newBlog).expect(400)
+    await api
+      .post(url)
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(400)
     const data = await api.get(url)
     expect(data.body.length).toBe(demoBlogs.length)
+  })
+
+  test('if i not have a token user', async () => {
+    const newBlog = {
+      title: 'Mi Primer Blog hola Que Hacer',
+      author: 'Marco Antonio Rivero',
+      url: 'myprimerblog.blog.com',
+      likes: 0,
+    }
+
+    const requestApi = await api.post(url).send(newBlog).expect(401)
+
+    expect(requestApi.body).toStrictEqual({ error: 'token missing or invalid' })
+  })
+
+  test('if I have a token user Invalid', async () => {
+    const newBlog = {
+      title: 'Mi Primer Blog hola Que Hacer',
+      author: 'Marco Antonio Rivero',
+      url: 'myprimerblog.blog.com',
+      likes: 0,
+    }
+
+    const requestApi = await api
+      .post(url)
+      .set('Authorization', `Bearer 75464654tokentekinsiismo1546`)
+      .send(newBlog)
+      .expect(401)
+
+    expect(requestApi.body).toStrictEqual({ error: 'token missing or invalid' })
   })
 })
 
 describe('Update a blog', () => {
-  test('when updateo a like', async () => {
-    const dbRequest = await dbFind(Blog)
-    const { id } = dbRequest[Math.floor(Math.random() * dbRequest.length)]
+  test('when updateo a like correct', async () => {
+    const { token, Blog_id } = await CreateABlogAndToken()
+
     const updaterBlog = {
       likes: 351,
     }
+
     const requestApi = await api
-      .put(`${url}/${id}`)
+      .put(`${url}/${Blog_id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updaterBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
+
     expect(requestApi.body.likes).toBe(351)
-    const dbRequestFind = await dbFindById(Blog, id)
+    const dbRequestFind = await dbFindById(Blog, Blog_id)
     expect(dbRequestFind.likes).toBe(351)
+  })
+
+  test('When update a note with other user', async () => {
+    const { Blog_id: id } = await CreateABlogAndToken()
+    const { token } = await singAUser()
+
+    const updaterBlog = {
+      likes: 351,
+      author: 'ElMarcoQueRoba',
+    }
+
+    const requestApi = await api
+      .put(`${url}/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updaterBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    expect(requestApi.body).toStrictEqual({
+      message: "You haven't authorization for edit this blog",
+    })
   })
 })
 describe('Delete a blog', () => {
-  test('when a delete a blog', async () => {
-    const dbRequest = await dbFind(Blog)
-    const position = Math.floor(Math.random() * dbRequest.length)
-    const { id, title } = dbRequest[position]
-    await api.delete(`${url}/${id}`).expect(204)
+  test('When a delete a blog successful', async () => {
+    const { Blog_id: id, title, token } = await CreateABlogAndToken()
+
+    await api
+      .delete(`${url}/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204)
     const dbRequestFind = await dbFind(Blog)
-    expect(dbRequestFind.length).toBe(dbRequest.length - 1)
+    expect(dbRequestFind.length).toBe(demoBlogs.length)
     expect(dbRequestFind.map((blog) => blog.title)).not.toContain(title)
+  })
+  test('When a try delete a blog with user not is a owner', async () => {
+    const { title, Blog_id: id } = await CreateABlogAndToken()
+    const { token } = await singAUser()
+
+    const DontAuthorize = await api
+      .delete(`${url}/${id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401)
+
+    expect(DontAuthorize.body).toStrictEqual({
+      message: "You haven't authorization for delete this blog",
+    })
+
+    const dbRequestFind = await dbFind(Blog)
+    expect(dbRequestFind.length).toBe(demoBlogs.length + 1)
+    expect(dbRequestFind.map((blog) => blog.title)).toContain(title)
   })
 })
 afterAll(async () => {

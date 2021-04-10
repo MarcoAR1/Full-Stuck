@@ -1,6 +1,9 @@
 const userRouter = require('express').Router()
 const User = require('../models/User.js')
 const bcrypt = require('bcrypt')
+const verifyToken = require('../utils/middleware/verifyToken')
+const { db } = require('../models/User.js')
+const Blog = require('../models/Blog.js')
 
 userRouter.get('/', async (_, res) => {
   const users = await User.find({}).populate('blogs_id', {
@@ -25,6 +28,24 @@ userRouter.post('/', async (req, res) => {
           ? 'usernama it too short, minimum 3 characters'
           : 'password it too short, minimum 3 characters',
     })
+  }
+})
+
+userRouter.delete('/', verifyToken, async (req, res) => {
+  const { username = '', password = '' } = req.body
+  const user_id = req.user_id
+  const user = await User.findOne({ _id: user_id })
+  const correct_password = user
+    ? await bcrypt.compare(password, user.password)
+    : false
+  if (correct_password && username === user.username) {
+    await User.findByIdAndDelete(user_id)
+    await Blog.deleteMany({ user_id: user_id })
+    res.status(204).end()
+  } else {
+    res
+      .status(401)
+      .send({ message: "You haven't authorization for edit this Usuario" })
   }
 })
 

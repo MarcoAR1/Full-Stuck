@@ -6,21 +6,21 @@ const bcrypt = require('bcrypt')
 
 loginRouter.post('/', async (req, res) => {
   const { username = '', password = '' } = req.body
-  const data = await User.findOne({ username })
-  const validation = data
-    ? await bcrypt.compare(password, data.password)
+  const user = await User.findOne({ username })
+  const validation = user
+    ? await bcrypt.compare(password, user.password)
     : false
 
   if (validation) {
     const tokenUser = {
-      id: data._id,
+      id: user._id,
       username,
     }
     const token = jwt.sign(tokenUser, SING, { expiresIn: 60 * 60 * 24 * 15 })
 
     return res.status(202).send({
       username,
-      name: data.name,
+      name: user.name,
       token,
     })
   } else {

@@ -1,9 +1,6 @@
 const mongoose = require('mongoose')
-const supertest = require('supertest')
-const { app, Server } = require('../index')
-const { dbResetUser } = require('../utils/list_halper')
+const { dbResetUser, Server, api } = require('../utils/list_halper')
 const url = `/api/login`
-const api = supertest(app)
 
 beforeEach(async () => {
   await dbResetUser()
