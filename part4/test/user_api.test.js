@@ -3,14 +3,19 @@ const supertest = require('supertest')
 const { app, Server } = require('../index')
 const Blog = require('../models/Blog')
 const User = require('../models/User')
-const { dbReset, dbFind, dbFindById } = require('../utils/list_halper')
-const [...demoBlogs] = require('./demoBlogs')
+const {
+  dbResetUser,
+  dbResetBlog,
+  dbFind,
+  dbFindById,
+} = require('../utils/list_halper')
 const [...demoUsername] = require('./demoUsername.js')
 const url = `/api/user`
 const api = supertest(app)
 
 beforeEach(async () => {
-  await dbReset(User, Blog, demoUsername, demoBlogs)
+  await dbResetUser()
+  await dbResetBlog()
 })
 
 describe('Get user test ', () => {

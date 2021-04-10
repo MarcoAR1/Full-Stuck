@@ -3,14 +3,19 @@ const supertest = require('supertest')
 const { app, Server } = require('../index')
 const Blog = require('../models/Blog')
 const User = require('../models/User')
-const { dbReset, dbFind, dbFindById } = require('../utils/list_halper')
+const {
+  dbFind,
+  dbFindById,
+  dbResetBlog,
+  dbResetUser,
+} = require('../utils/list_halper')
 const [...demoBlogs] = require('./demoBlogs.js')
-const [...demoUsername] = require('./demoUsername')
 const url = `/api/blogs`
 const api = supertest(app)
 
 beforeEach(async () => {
-  await dbReset(User, Blog, demoUsername, demoBlogs)
+  await dbResetUser()
+  await dbResetBlog()
 })
 
 describe('Get blogs api', () => {
@@ -62,6 +67,12 @@ describe('Post a blog', () => {
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
+
+    const userLogin = await api
+      .post('api/login')
+      .send({ username: 'Micheltone', password: 'React patterns' })
+    console.log(userLogin.body)
+
     const requestApi = await api.get(url)
     const data = requestApi.body
     expect(data.map((blog) => blog.title)).toContain(newBlog.title)

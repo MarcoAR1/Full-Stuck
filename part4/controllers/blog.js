@@ -11,6 +11,7 @@ blogRoutes.get('/', async (_, res) => {
 
 blogRoutes.post('/', async (req, res) => {
   const { title, author, url, likes } = req.body
+
   const blog = new Blog({ title, author, url, likes: likes || 0 })
 
   const save = await blog.save()

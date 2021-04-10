@@ -4,7 +4,8 @@ const blogRoutes = require('./controllers/blog')
 const userRouter = require('./controllers/user')
 const cors = require('cors')
 const morgan = require('morgan')
-const { handleError } = require('./utils/middleware')
+const { handleError } = require('./utils/middleware/handleError')
+const loginRouter = require('./controllers/login')
 
 //Settings
 const app = express()
@@ -22,6 +23,7 @@ morgan.token('json', (req) => {
 //Routes
 app.use('/api/blogs', blogRoutes)
 app.use('/api/user', userRouter)
+app.use('/api/login', loginRouter)
 
 //Middleware Error
 app.use(handleError)
