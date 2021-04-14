@@ -2,9 +2,9 @@ require('dotenv').config()
 require('./mongo')
 const { info } = require('./utils/loggers')
 const app = require('./app.js')
-const { PORT, PORT_TEST, NODE_ENV } = require('./utils/config')
+const { PORT } = require('./utils/config')
 
-app.set('port', NODE_ENV === 'test' ? PORT_TEST : PORT)
+app.set('port', PORT)
 const Server = app.listen(app.get('port'), () => {
   info(`Server running on port ${app.get('port')}`)
 })

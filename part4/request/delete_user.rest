@@ -1,8 +1,12 @@
-DELETE  http://localhost:3003/api/user
+DELETE  http://localhost:3001/api/user
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNzIwMjgwMjBhODgzMjgxOGExMGRkYyIsInVzZXJuYW1lIjoiTWFyY29FbERlbEFyY28iLCJpYXQiOjE2MTgwODQ0OTUsImV4cCI6MTYxOTM4MDQ5NX0.cKJ6532S7rsNj-x9JOClLnbIj_feCScPrwXsb2DqpAA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNzJkNmE5NWU3MjE2MzBkYzE5ZTE5NCIsInVzZXJuYW1lIjoiYXNkYXNkIiwiaWF0IjoxNjE4MTQwNjQ2LCJleHAiOjE2MTk0MzY2NDZ9.Nitr882LrmEfc_yJYhR493QotSAAt7sdS1bKJz5_g6A
+
 
 {
- "username":"MarcoElDelArco",
- "password":"61651165161"
+    "blogs_id": [],
+    "name": "",
+    "username": "asdasd",
+    "id": "6072d6a95e721630dc19e194",
+    "password":"asdasd"
 }

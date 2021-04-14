@@ -2,7 +2,6 @@ const userRouter = require('express').Router()
 const User = require('../models/User.js')
 const bcrypt = require('bcrypt')
 const verifyToken = require('../utils/middleware/verifyToken')
-const { db } = require('../models/User.js')
 const Blog = require('../models/Blog.js')
 
 userRouter.get('/', async (_, res) => {

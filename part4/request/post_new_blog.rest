@@ -1,6 +1,6 @@
-POST http://localhost:3003/api/blogs
+POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNzIwMjgwMjBhODgzMjgxOGExMGRkYyIsInVzZXJuYW1lIjoiTWFyY29FbERlbEFyY28iLCJpYXQiOjE2MTgwODQ0OTUsImV4cCI6MTYxOTM4MDQ5NX0.cKJ6532S7rsNj-x9JOClLnbIj_feCScPrwXsb2DqpAA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNzJkZTFkMjRmNGE4MzA0NGNiMzUyMCIsInVzZXJuYW1lIjoiTWFyY29FbERlbEFyY28iLCJpYXQiOjE2MTgxNDE1NjEsImV4cCI6MTYxOTQzNzU2MX0.dQuHWbXscrDO5AKqujYgJ0A6m8-bx2Xmw6MAjzodCK8
 
 {
   "title": "hola que hhace",

@@ -44,6 +44,7 @@ blogRoutes.delete('/:id', verifyToken, async (req, res) => {
   const { id } = req.params
   const user_id = req.user_id
   const blog = await Blog.findOne({ _id: id })
+  console.log(user_id, blog.user_id)
   if (user_id === blog.user_id.toString()) {
     await Blog.findByIdAndDelete(id)
     res.status(204).end()

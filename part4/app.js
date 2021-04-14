@@ -6,6 +6,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const { handleError } = require('./utils/middleware/handleError')
 const loginRouter = require('./controllers/login')
+const { NODE_ENV } = require('./utils/config')
 
 //Settings
 const app = express()
@@ -21,6 +22,10 @@ morgan.token('json', (req) => {
 })
 
 //Routes
+if (NODE_ENV === 'test') {
+  const resetTestRoutes = require('./controllers/reset')
+  app.use('/api/testing/reset', resetTestRoutes)
+}
 app.use('/api/blogs', blogRoutes)
 app.use('/api/user', userRouter)
 app.use('/api/login', loginRouter)
